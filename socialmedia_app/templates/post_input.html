@@ -1,0 +1,23 @@
+{% load static %}
+<!-- Post Box (Click to Open Modal) -->
+
+<div class="bg-gray-800 p-4 rounded-lg flex items-center space-x-4 cursor-pointer hover:bg-gray-700" onclick="openCreateModal()">
+    <!-- Profile Picture -->
+    {% if user.profile.profile_picture %}
+        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+    {% else %}
+        <img src="{% static 'img/profile_default.webp' %}" alt="Default Profile" class="w-8 h-8 rounded-full object-cover cursor-pointer">
+    {% endif %}
+    
+    
+    <!-- Input Placeholder -->
+    <input class="w-full bg-gray-700 p-3 rounded-full text-white cursor-pointer placeholder-gray-400" placeholder="What's on your mind, {{ user.username|capfirst }}?" readonly>
+</div>
+
+
+
+
+
+
+
+

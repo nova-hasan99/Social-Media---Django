@@ -1,0 +1,83 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-gray-900">
+
+    {% if messages %}
+        <div id="message-box" class="fixed top-5 left-[34%] transform -translate-x-1/1 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-md text-center animate-slide-down">
+            {% for message in messages %}
+            <p class="font-semibold {% if message.tags == 'success' %} text-green-400 {% elif message.tags == 'error' %} text-red-400 {% endif %}">
+                {{ message }}
+            </p>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(() => {
+                document.getElementById('message-box')?.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                setTimeout(() => document.getElementById('message-box')?.remove(), 500);
+            }, 4000);
+        </script>
+    {% endif %}
+
+    <div class="flex justify-center items-center h-screen">
+        <div class="w-full max-w-md bg-gray-800 text-white p-6 rounded-lg shadow-lg">
+            <!-- Facebook Logo -->
+            <div class="text-center mb-6">
+                <h1 class="text-4xl font-bold text-blue-500">facebook</h1>
+                <p class="text-gray-400 text-sm mt-2">Connect with friends and the world around you.</p>
+            </div>
+    
+            <!-- Login Form -->
+            <form method="POST">
+                {% csrf_token %}
+                <!-- Username/Email Input -->
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-300">Email or Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your email or username"
+                           class="w-full p-3 mt-1 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+            
+                <!-- Password Input -->
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password"
+                           class="w-full p-3 mt-1 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between text-sm text-gray-400">
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4 bg-gray-700 border-gray-600 focus:ring-blue-500">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="text-blue-500 hover:underline">Forgot password?</a>
+                </div>
+            
+                <!-- Login Button -->
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-blue-600 p-3 rounded-lg font-bold hover:bg-blue-500">
+                        Log In
+                    </button>
+                </div>
+            </form>        
+    
+            <!-- Sign Up Link -->
+            <div class="mt-6 text-center">
+                <p class="text-gray-400 text-sm">Don't have an account? 
+                    <a href="{% url 'register' %}" class="text-blue-500 font-bold hover:underline">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+
+</body>
+</html>

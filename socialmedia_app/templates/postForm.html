@@ -1,0 +1,211 @@
+{% load static %}
+<!-- Post Modal (Hidden by Default) -->
+
+<div id="postModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-gray-900 p-6 rounded-lg shadow-lg w-[32rem]">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+
+            <h2 id="modalTitle" class="text-lg text-white font-bold">Create post</h2>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-white text-xl">✖</button>
+        </div>
+
+        <!-- User Profile Info -->
+        <div class="flex items-center space-x-3 mt-3">
+            {% if user.profile.profile_picture %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-10 h-10 object-cover rounded-full ">
+            {% else %}
+                <img src="{% static 'img/profile_default.webp' %}" alt="Default Profile" class="w-8 h-8 object-cover rounded-full cursor-pointer">
+            {% endif %}
+            
+            <div>
+                <h3 class="text-white font-semibold">{{ user.username|capfirst }}</h3>
+            </div>
+        </div>
+
+        <!-- Post Form -->
+        <form id="postForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Hidden Post ID for Editing -->
+            <input type="hidden" id="postId" name="post_id" value="{{ form.instance.pk|default:'' }}">
+        
+            <!-- Post Content Textarea -->
+            <div class="border rounded-lg p-4 m-4 h-[220px] overflow-y-auto">
+                <textarea name="description" id="postDescription"
+                      class="border-none w-full bg-transparent text-white text-xl placeholder-gray-500 resize-none"
+                      rows="4" placeholder="What's on your mind?">{{ form.instance.description }}</textarea>
+        
+                <!-- Preview Image (if exists) -->
+                {% if form.instance.image %}
+                <img id="imagePreview" src="{{ form.instance.image.url }}" class="mt-3 w-full rounded-lg">
+                {% else %}
+                <img id="imagePreview" class="mt-3 w-full rounded-lg hidden">
+                {% endif %}
+            </div>
+        
+            <!-- Media Upload -->
+            <div class="flex items-center space-x-4 mt-3 border-t border-gray-700 pt-3">
+                <span class="text-gray-300">Add to your post:</span>
+                <label for="fileInput" class="cursor-pointer">
+                    <img src="https://static.xx.fbcdn.net/rsrc.php/v4/y7/r/Ivw7nhRtXyo.png" class="w-6 h-6">
+                </label>
+                <input id="fileInput" type="file" name="image" class="hidden">
+                <img class="x1b0d499 xl1xv1r" alt="" src="https://static.xx.fbcdn.net/rsrc.php/v4/yq/r/b37mHA1PjfK.png" style="height: 24px; width: 24px;">
+                <img class="x1b0d499 xl1xv1r" alt="" src="https://static.xx.fbcdn.net/rsrc.php/v4/yd/r/Y4mYLVOhTwq.png" style="height: 24px; width: 24px;">
+                <img class="x1b0d499 xl1xv1r" alt="" src="https://static.xx.fbcdn.net/rsrc.php/v4/y1/r/8zlaieBcZ72.png" style="height: 24px; width: 24px;">
+                <img class="x1b0d499 xl1xv1r" alt="" src="https://static.xx.fbcdn.net/rsrc.php/v4/y1/r/8zlaieBcZ72.png" style="height: 24px; width: 24px;">
+
+            </div>
+        
+            <!-- Submit Button -->
+            <button type="submit" id="submitButton"
+                    class="w-full bg-blue-600 p-2 rounded-lg text-white font-bold mt-4 hover:bg-blue-500">
+                {% if form.instance.pk %} Update {% else %} Post {% endif %}
+            </button>
+        </form>
+        
+        
+        
+    </div>
+</div>
+
+
+<script >
+    
+    
+    document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("fileInput");
+    const imagePreview = document.getElementById("imagePreview");
+    const postForm = document.getElementById("postForm");
+
+    // Function to get CSRF token from cookies
+    function getCSRFToken() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith("csrftoken=")) {
+                    cookieValue = decodeURIComponent(cookie.substring("csrftoken=".length));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Preserve Existing Image Preview in Edit Mode
+    if (imagePreview && imagePreview.src.trim() !== "" && imagePreview.src !== window.location.href) {
+        imagePreview.classList.remove("hidden"); // Show image if already stored
+    }
+
+    // Image Preview on File Selection (Create & Update)
+    fileInput.addEventListener("change", function (event) {
+        let file = event.target.files[0];
+
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.remove("hidden");
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Form Submission (Create or Update Post)
+    postForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this);
+        const postId = document.getElementById("postId").value;
+        const username = "{{ user.username }}"; // Get logged-in username from template
+
+        let url = `/profile/${username}/post/create/`; // Default URL for creating a post
+        if (postId) {
+            url = `/profile/${username}/post/edit/${postId}/`; // Change URL if editing
+        }
+
+        fetch(url, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCSRFToken() // Get CSRF token dynamically
+            }
+        })
+        .then(response => response.text()) // First get raw response text
+        .then(text => {
+            try {
+                return JSON.parse(text); // Try parsing as JSON
+            } catch (error) {
+                console.error("Invalid JSON response:", text); // Log error if response is not JSON
+                throw new Error("Invalid JSON response");
+            }
+        })
+        .then(data => {
+            if (data.success) {
+                closeModal(); // Close modal after submission
+                location.reload(); // Reload page to show updated post
+            } else {
+                alert("Error: " + JSON.stringify(data.errors)); // Show error messages
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+
+
+function openCreateModal() {
+    let modal = document.getElementById('postModal');
+    if (!modal) {
+        console.error("Modal not found!");
+        return;
+    }
+    
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';  
+}
+
+function openEditModal(postId, description, imageUrl = null) {
+    let modal = document.getElementById('postModal');
+    document.getElementById("postId").value = postId;  // Set post ID
+    document.getElementById("postDescription").value = description;  // Set post text
+
+    // Update the modal title dynamically
+    document.getElementById("modalTitle").innerText = postId ? "Edit Post" : "Create Post";
+    document.getElementById("submitButton").innerText = postId ? "Update" : "Post";
+
+    // Handle Existing Image Preview (Show if exists)
+    let imagePreview = document.getElementById("imagePreview");
+
+    if (imageUrl) {
+        imagePreview.src = imageUrl; // Set existing image
+        imagePreview.classList.remove("hidden"); // Show image
+    } else {
+        imagePreview.classList.add("hidden"); // Hide image if none exists
+    }
+
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex'; 
+}
+
+function closeModal() {
+    let modal = document.getElementById('postModal');
+    if (!modal) {
+        console.error("Modal not found!");
+        return;
+    }
+
+    // Hide the modal properly
+    modal.classList.add('hidden');
+    modal.style.display = 'none'; 
+}
+
+
+
+
+
+</script>

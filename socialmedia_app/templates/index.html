@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Facebook {% endblock title %}
+
+{% block content %}
+
+<div class="bg-gray-900 text-white min-h-screen flex pt-16">
+    <!-- Left Sidebar (Fixed) -->
+    <div class="w-1/4 p-4 hidden lg:block h-screen sticky top-16 overflow-hidden">
+        <ul class="space-y-1">
+            <li class="flex items-center space-x-3 hover:bg-gray-500/30 rounded-lg cursor-pointer py-2 transition-transform duration-300 ease-in-out hover:scale-110"><i class="fas fa-user-friends"></i> <span>Friends</span></li>
+            <li class="flex items-center space-x-3 hover:bg-gray-500/30 rounded-lg cursor-pointer py-2 transition-transform duration-300 ease-in-out hover:scale-110"><i class="fas fa-bookmark"></i> <span>Saved</span></li>
+            <li class="flex items-center space-x-3 hover:bg-gray-500/30 rounded-lg cursor-pointer py-2 transition-transform duration-300 ease-in-out hover:scale-110"><i class="fas fa-clock"></i> <span>Memories</span></li>
+            <li class="flex items-center space-x-3 hover:bg-gray-500/30 rounded-lg cursor-pointer py-2 transition-transform duration-300 ease-in-out hover:scale-110"><i class="fas fa-users"></i> <span>Groups</span></li>
+            <li class="flex items-center space-x-3 hover:bg-gray-500/30 rounded-lg cursor-pointer py-2 transition-transform duration-300 ease-in-out hover:scale-110"><i class="fas fa-tv"></i> <span>Video</span></li>
+            <li class="flex items-center space-x-3 hover:bg-gray-500/30 rounded-lg cursor-pointer py-2 transition-transform duration-300 ease-in-out hover:scale-110"><i class="fas fa-store"></i> <span>Marketplace</span></li>
+        </ul>
+
+        <div class="bg-gray-400 w-full h-[1px] mt-4 mb-4"></div>
+    </div>
+
+    <!-- Main Content (Scrollable) -->
+    <div class="w-full lg:w-2/4 p-4 h-screen overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden scrollbar-none">
+        <!-- Post Input -->
+         {% if user.is_authenticated %}
+            {% include "./post_input.html" %}
+         {% endif %}
+        
+
+        <!-- Stories Section -->
+        <div class="mt-4 flex space-x-2 overflow-hidden w-full">
+            <div class="gap-2 flex items-center justify-center">
+                <img class="transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer object-cover w-[150px] h-[220px] rounded-lg" src="https://i.pinimg.com/236x/d8/28/5e/d8285e7cb542920ff0d93f7749072bbf.jpg" alt="">
+                <img class="transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer object-cover w-[150px] h-[220px] rounded-lg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0ZX4XwGXX0_lmNckrqUQhMzPWe9qkx-hYng&s" alt="">
+                <img class="transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer object-cover w-[150px] h-[220px] rounded-lg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdOiYvdP3jdQFQBoU2MPw-3dldFFBTK-m0hg&s" alt="">
+                <img class="transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer object-cover w-[150px] h-[220px] rounded-lg" src="https://templates.mediamodifier.com/5e465cab69fba16189edef00/motivational-quote-facebook-story-template.jpg" alt="">
+            </div>
+        </div>
+
+        <!-- Posts Section -->
+        {% for post in posts %}
+        <div class="mt-4 space-y-4">
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <div class="flex justify-between">
+                    <div class="flex items-center space-x-2">
+                        <a href="{% url 'profile' post.user.username %}">
+                            {% if post.user.profile.profile_picture %}
+                                <img src="{{ post.user.profile.profile_picture.url }}" class="w-10 h-10 object-cover rounded-full">
+                            {% else %}
+                                <img src="{% static 'img/profile_default.webp' %}" alt="Default Profile" class="w-8 h-8 rounded-full cursor-pointer">
+                            {% endif %}
+                        </a>
+                        
+                        <div>
+                            <a href="{% url 'profile' post.user.username %}" class="font-bold">{{ post.user.username|capfirst }}</a>
+                            <p class="text-xs text-gray-400">{{ post.created_at|date:"F j, Y" }}</p>
+                        </div>
+                    </div>                   
+                </div>
+                <p class="mt-2 post-description">
+                    {{ post.description|slice:":255" }}... 
+                    <button class="text-blue-500 see-more-btn">See More</button>
+                </p>
+                
+                <p class="mt-2 hidden full-description">
+                    {{ post.description }}
+                </p>
+                
+
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="mt-2 rounded-lg w-full">
+                {% endif %}
+
+                <!-- Reactions & Comments -->
+                <div class="flex items-center justify-between text-gray-400 text-sm mt-2">
+                    <div class="flex items-center space-x-2">
+                        <img src="https://cdn-icons-png.flaticon.com/512/889/889102.png" class="w-5 h-5">
+                        <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" class="w-5 h-5">
+                        <img src="https://cdn-icons-png.flaticon.com/512/742/742752.png" class="w-5 h-5">
+                        <span>120</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <i class="far fa-comment"></i>
+                        <span>45</span>
+                    </div>
+                </div>
+
+                <!-- Like, Comment, Share Buttons -->
+                <hr class="my-2 border-gray-700">
+                <div class="flex justify-between text-gray-400 text-sm">
+                    <button class="flex items-center space-x-1 hover:text-white">
+                        <i class="far fa-thumbs-up"></i>
+                        <span>Like</span>
+                    </button>
+                    <button class="flex items-center space-x-1 hover:text-white">
+                        <i class="far fa-comment"></i>
+                        <span>Comment</span>
+                    </button>
+                    <button class="flex items-center space-x-1 hover:text-white">
+                        <i class="fas fa-share"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+        
+        
+    </div>
+
+    <!-- Right Sidebar (Fixed) -->
+    <div class="w-1/4 p-4 hidden lg:block h-screen sticky top-16 overflow-hidden">
+        <h3 class="text-lg font-bold">Sponsored</h3>
+        <div class="mt-2 overflow-hidden">
+            <img class="transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer mb-2 rounded-lg object-cover" src="https://tuberanker.com/storage/images/page/33/fullhd-How%20To%20Change%20YouTube%20Banner%20Image.png" alt="">
+            <img class="transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer mb-2 rounded-lg object-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaP-G9Bv6oW2dS9hpXhPx7txoRXVruN7995Q&s" alt="">
+        </div>
+
+        <h3 class=" text-lg font-bold">Birthdays</h3>
+        <p class="text-sm text-gray-400">No birthdays today</p>
+        <div class="mt-4 w-full h-[1px] bg-gray-500"></div>
+
+        <h1 class="mt-2"><span class="text-gray-500 ">(45)</span> friends now active</h1>
+        <div class="mt-4">
+            <div class="flex transition-transform duration-300 ease-in-out hover:scale-110 items-center gap-2 mt-2 hover:bg-gray-500/30 rounded-lg cursor-pointer">
+                <img class="w-10 h-10 object-cover rounded-full" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO5o4empTvUKcKI8KhtuUDwKgsqDaSjoMfXg&s" alt="">
+                <h1>Hasan Khan</h1>
+            </div>
+
+            <div class="flex transition-transform duration-300 ease-in-out hover:scale-110 items-center gap-2 mt-2 hover:bg-gray-500/30 rounded-lg cursor-pointer">
+                <img class="w-10 h-10 object-cover rounded-full" src="https://t4.ftcdn.net/jpg/02/14/74/61/360_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg" alt="">
+                <h1>Abdul Karim</h1>
+            </div>
+
+            <div class="flex transition-transform duration-300 ease-in-out hover:scale-110 items-center gap-2 mt-2 hover:bg-gray-500/30 rounded-lg cursor-pointer">
+                <img class="w-10 h-10 object-cover rounded-full" src="https://www.shutterstock.com/shutterstock/photos/2200214153/display_1500/stock-photo-confident-rich-eastern-indian-business-man-executive-standing-in-modern-big-city-looking-and-2200214153.jpg" alt="">
+                <h1>Masud Rana</h1>
+            </div>
+
+            <div class="flex transition-transform duration-300 ease-in-out hover:scale-110 items-center gap-2 mt-2 hover:bg-gray-500/30 rounded-lg cursor-pointer">
+                <img class="w-10 h-10 object-cover rounded-full" src="https://static.vecteezy.com/system/resources/thumbnails/042/730/459/small/lion-danger-animal-wildlife-nature-forest-photo.jpg" alt="">
+                <h1>Shohan Islam</h1>
+            </div>
+
+            <div class="flex transition-transform duration-300 ease-in-out hover:scale-110 items-center gap-2 mt-2 hover:bg-gray-500/30 rounded-lg cursor-pointer">
+                <img class="w-10 h-10 object-cover rounded-full" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO5o4empTvUKcKI8KhtuUDwKgsqDaSjoMfXg&s" alt="">
+                <h1>Waziha Tasnim</h1>
+            </div>
+
+            <div class="flex transition-transform duration-300 ease-in-out hover:scale-110 items-center gap-2 mt-2 hover:bg-gray-500/30 rounded-lg cursor-pointer">
+                <img class="w-10 h-10 object-cover rounded-full" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO5o4empTvUKcKI8KhtuUDwKgsqDaSjoMfXg&s" alt="">
+                <h1>Shahidul Islam</h1>
+            </div>
+
+
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const seeMoreButtons = document.querySelectorAll('.see-more-btn');
+
+    seeMoreButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postDescription = button.closest('.post-description');
+            const fullDescription = postDescription.nextElementSibling;
+
+            // Toggle visibility of the full description
+            if (fullDescription.classList.contains("hidden")) {
+                fullDescription.classList.remove("hidden");
+                button.innerText = "See Less";
+            } else {
+                fullDescription.classList.add("hidden");
+                button.innerText = "See More";
+            }
+        });
+    });
+});
+
+</script>
+
+
+{% endblock content %}
