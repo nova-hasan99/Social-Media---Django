@@ -8,7 +8,7 @@ A simple Django-based social media project that works like Facebook — allowing
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Hasan-Ruhani/py-assignment.git
+   git clone hhttps://github.com/nova-hasan99/Social-Media---Django.git
 
 
 2. Go to the project directory
@@ -27,17 +27,17 @@ A simple Django-based social media project that works like Facebook — allowing
 6. Open in your browser
 	`http://127.0.0.1:8000`
 
-`................................................................`
+---
 
 On the top-right corner, you will see the Login button.
 
 Click Login and use these credentials:
 
-	- Username: `hasan` or
+	- Username: hasan or
 
-	- Email: `hasan25042019@gmail.com`
+	- Email: hasan25042019@gmail.com
 
-	- Password: `xp470.kk`
+	- Password: xp470.kk
 
 After login, the Login button changes to your profile picture. Click it to visit your profile.
 
